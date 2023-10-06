@@ -1,11 +1,12 @@
 {
-  description = "TODO";
+  description = "Router based on the Raspberry Pi Compute Module 4";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, ... }:
+  outputs = { self, nixpkgs, nixos-hardware, ... }:
     let
 
       # to work with older version of flakes
@@ -36,6 +37,7 @@
         modules = [
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           ./configuration.nix
+            nixos-hardware.nixosModules.raspberry-pi-4
           {
             nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
             nix.registry.nixpkgs.flake = nixpkgs;
@@ -47,14 +49,10 @@
 
       packages = forAllSystems (system:
         rec {
-
-
           # Generate a sd-card image for the pi
           # nix build '.#raspi-image'
           raspi-image =
             self.nixosConfigurations.photobooth-pi.config.system.build.sdImage;
-          # inherit (nixpkgsFor.${system}) hello;
-
           default = raspi-image;
         });
     };
