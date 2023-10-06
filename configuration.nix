@@ -22,9 +22,9 @@
 
     # powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 
-    # boot = {
-    #   kernelParams = [ "console=ttyS1,115200n8" ];
-    #   loader = {
+    boot = {
+      kernelParams = [ "console=ttyS1,115200n8" ];
+      # loader = {
     #     raspberryPi = {
     #       firmwareConfig = ''
     #         dtparam=poe_fan_temp0=50000
@@ -34,7 +34,7 @@
     #       '';
     #     };
     #   };
-    # };
+    };
 
     # Define a user account.
     users.users.root = {
