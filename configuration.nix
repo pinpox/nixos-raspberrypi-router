@@ -123,7 +123,7 @@
     # documentation.nixos.enable = false;
     # boot.cleanTmpDir = true;
 
-    system.stateVersion = "23.11";
+    system.stateVersion = "23.05";
 
   };
 }
