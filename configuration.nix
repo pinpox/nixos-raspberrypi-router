@@ -7,9 +7,9 @@
     # Hardware-specific settings
 
     # Required for the Wireless firmware
-    hardware.enableRedistributableFirmware = true;
+    # hardware.enableRedistributableFirmware = true;
 
-    powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
+    # powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 
     # boot = {
     #   kernelParams = [ "console=ttyS1,115200n8" ];
@@ -83,10 +83,10 @@
       };
     };
 
-    boot.initrd.availableKernelModules = [ "usbhid" ];
-    boot.initrd.kernelModules = [ ];
-    boot.kernelModules = [ ];
-    boot.extraModulePackages = [ ];
+    # boot.initrd.availableKernelModules = [ "usbhid" ];
+    # boot.initrd.kernelModules = [ ];
+    # boot.kernelModules = [ ];
+    # boot.extraModulePackages = [ ];
 
     # Use 1GB of additional swap memory in order to not run out of memory
     # when installing lots of things while running other things at the same time.
@@ -98,10 +98,10 @@
     environment.systemPackages = with pkgs; [
 
       # Needed for operation
-      libraspberrypi
+      # libraspberrypi
 
       # Optional, for development
-      git
+      # git
 
     ];
 
