@@ -4,6 +4,17 @@
 
   config = {
 
+
+
+    nixpkgs.overlays = [
+      (final: super: {
+        makeModulesClosure = x:
+          super.makeModulesClosure (x // { allowMissing = true; });
+      })
+    ];
+
+
+
     # Hardware-specific settings
 
     # Required for the Wireless firmware
