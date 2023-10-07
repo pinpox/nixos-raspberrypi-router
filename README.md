@@ -31,12 +31,9 @@ nixos-rebuild switch --flake '.#nixos-router' --target-host 'root@192.182.X.X' -
 ## Debugging
 
 The Raspberry Pi is configured to provide a TTY via serial on the GPIO pins 8
-and 10 (WiringPi numbers 15 and 16) with 115200 baud speed.
-
-![](./pins.jpg)
-
-Connecting a UART adapter should yield a console allowing you to log in. E.g.
-with:
+and 10 with 115200 baud speed. See
+[schematic](./doc/CM4-DUAL-ETH-MINI-SchDoc.pdf) for pinouts. Connecting a UART
+adapter should yield a console allowing you to log in. E.g. with:
 
 ```sh
 minicom -D /dev/ttyUSB0 -b 115200
