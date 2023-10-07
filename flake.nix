@@ -27,12 +27,9 @@
     in
     {
 
-      # nixosModules.photobooth = { config, pkgs, lib, ... }: {
-      #   systemd.services.photobooth = {
-      #   };
-      # };
+      # nixosModules.mymodule = { config, pkgs, lib, ... }: { };
 
-      nixosConfigurations.photobooth-pi = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.nixos-router = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
@@ -52,7 +49,7 @@
           # Generate a sd-card image for the pi
           # nix build '.#raspi-image'
           raspi-image =
-            self.nixosConfigurations.photobooth-pi.config.system.build.sdImage;
+            self.nixosConfigurations.nixos-router.config.system.build.sdImage;
           default = raspi-image;
         });
     };
