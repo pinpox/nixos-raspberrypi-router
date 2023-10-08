@@ -10,6 +10,16 @@ pipeline:
       - attic login lounge-rocks https://cache.lounge.rocks $ATTIC_KEY --set-default
     secrets: [attic_key]
 
+  - name: build nixosConfigurations
+    image: nixos/nix
+    commands:
+      - nix build --print-out-paths .\#nixosConfigurations.nixos-router.config.system.build.toplevel
+
+  - name: push nixosConfigurations
+    image: bash
+    commands:
+      - attic push nix-cache result
+
   - name: build image
     image: bash
     commands:
