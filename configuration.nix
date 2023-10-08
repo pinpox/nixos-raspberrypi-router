@@ -9,6 +9,7 @@ in
     ./ssh.nix
     ./dns.nix
     ./hardware.nix
+    ./nftables.nix
     # ./nat.nix
     # ./firewall.nix
     # ./dhcp.nix
