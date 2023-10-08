@@ -11,7 +11,7 @@ pipeline:
     secrets: [attic_key]
 
   - name: build nixosConfigurations
-    image: nixos/nix
+    image: bash
     commands:
       - nix build --print-out-paths .\#nixosConfigurations.nixos-router.config.system.build.toplevel
 
@@ -29,4 +29,3 @@ pipeline:
     image: bash
     commands:
       - attic push nix-cache result
-
