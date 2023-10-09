@@ -1,5 +1,7 @@
 # NixOS router
 
+![](doc/banner.svg)
+
 ## Hardware
 
 - Raspberry Pi Compute Module 4
