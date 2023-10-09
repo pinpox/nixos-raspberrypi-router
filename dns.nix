@@ -3,6 +3,12 @@ let
   cfg = config.pi-router;
 in
 {
+
+  networking.firewall.interfaces."${cfg.interfaces.lan.name}" = {
+    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [ 53 ];
+  };
+
   services.unbound = {
     enable = true;
     settings = {
