@@ -6,6 +6,11 @@ in
 
   systemd.network.enable = true;
 
+  networking.firewall.allowedUDPPorts = [
+    # DHCP
+    67
+  ];
+
 
   systemd.network.networks.net-lan = {
 
