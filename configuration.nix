@@ -12,7 +12,7 @@ in
     ./nftables.nix
     # ./nat.nix
     # ./firewall.nix
-    # ./dhcp.nix
+    ./dhcp.nix
   ];
 
   options.pi-router = {
