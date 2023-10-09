@@ -60,7 +60,10 @@ in
       ];
     };
 
-    environment.systemPackages = with pkgs; [ dnsutils ];
+    environment.systemPackages = with pkgs; [
+      dnsutils # dig, nslookup, etc.
+      iperf3 # speedtest between 2 devices
+    ];
 
     # Time zone and internationalisation
     time.timeZone = "Europe/Berlin";
