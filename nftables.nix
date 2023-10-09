@@ -31,6 +31,8 @@ let cfg = config.pi-router.interfaces; in
 
       define WAN_IFC = { "${cfg.wan.name}" }
 
+      define ALL_IFC = { "${cfg.lan.name}" "${cfg.wan.name}" }
+
       table inet filter {
           # Block all incomming connections traffic except SSH and "ping" and DNS.
           chain input {
@@ -70,6 +72,12 @@ let cfg = config.pi-router.interfaces; in
 
           chain forward {
               type filter hook forward priority 0;
+              
+              # allow LAN to WAN
+              iifname $LAN_IFC oifname $WAN_IFC accept
+
+              # drop new packages between interfaces
+              iifname $ALL_IFC oifname $ALL_IFC ct state new counter drop
 
               accept
           }
