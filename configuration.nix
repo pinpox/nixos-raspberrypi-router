@@ -60,6 +60,8 @@ in
       ];
     };
 
+    environment.systemPackages = with pkgs; [ dnsutils ];
+
     # Time zone and internationalisation
     time.timeZone = "Europe/Berlin";
 
