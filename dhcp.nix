@@ -4,6 +4,8 @@ let
 in
 {
 
+  systemd.network.enable = true;
+
 
   systemd.network.networks.net-lan = {
 
@@ -15,7 +17,7 @@ in
     DHCP = "yes";
 
     # Takes a boolean. If set to "yes", DHCPv4 server will be started. Defaults to "no". Further settings for the DHCP server may be set in the [DHCPServer] section described below.
-    DHCPServer = "yes";
+    # DHCPServer = "yes";
 
     # routes = [ { Gateway = "192.168.0.1"; } ];
 
@@ -31,7 +33,7 @@ in
 
     # A list of addresses to be added to the network section of the unit. See
     # systemd.network(5) for details.
-    # address = [ ];
+    address = [ "${cfg.interfaces.lan.ip}/24" ];
 
     # services.dhcpd4 = {
     #     enable = true;
