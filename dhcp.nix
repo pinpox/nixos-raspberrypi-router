@@ -5,38 +5,37 @@ in
 {
 
   systemd.network.enable = true;
+  networking = {
+    useDHCP = false;
+    nameservers = [ "1.1.1.1" "1.0.0.1" ];
+    # nat.enable = true;
+    # nat.enableIPv6 = true;
+    # nat.externalInterface = "enp1s0";
+    # nat.internalInterfaces = [ "enp2s0" "enp3s0" "enp4s0" ];
+
+    firewall.interfaces =
+      let
+        portlist = [ 53 22 67 68 ];
+      in
+      {
+        "${cfg.interfaces.wan.name}" = {
+          allowedTCPPorts = portlist;
+          allowedUDPPorts = portlist;
+        };
+        "${cfg.interfaces.lan.name}" = {
+          allowedTCPPorts = portlist;
+          allowedUDPPorts = portlist;
+        };
+      };
+  };
 
   systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
-
-  networking.firewall.allowedUDPPorts = [
-    # DHCP
-    67
-    68
-  ];
-
-
-
-  # [Match]
-  # Name=wlan0
-
-  # [Network]
-  # Address=10.1.1.1/24
-  # DHCPServer=true
-  # IPMasquerade=ipv4
-
-  # [DHCPServer]
-  # PoolOffset=100
-  # PoolSize=20
-  # EmitDNS=yes
-  # DNS=9.9.9.9
-
-
-
 
   systemd.network.networks.net-lan = {
 
     # The name of the network interface to match against. ([Match] Block)
-    name = cfg.interfaces.lan.name;
+    # name = cfg.interfaces.lan.name;
+    matchConfig.Name = cfg.interfaces.lan.name;
 
     # Whether to enable DHCP on the interfaces matched.
     # Accepts "yes", "no", "ipv4", or "ipv6"
@@ -46,17 +45,35 @@ in
     # of the unit. See systemd.network(5) for details
     networkConfig = {
 
-      Description = "My LAN Network";
+      # Description = "My LAN Network";
+
       # Takes a boolean. If set to "yes", DHCPv4 server will be started.
       # Defaults to "no". Further settings for the DHCP server may be set in
       # the [DHCPServer] section described below.
-      DHCPServer = "yes";
-IPMasquerade="ipv4";
+      DHCPServer = true;
+      # IPMasquerade="ipv4";
 
       # Address=10.1.1.1/24
       # DHCPServer=true
 
     };
+
+
+    # Each attribute in this set specifies an option in the [DHCPServer]
+    # section of the unit. See systemd.network(5) for details.
+
+
+    dhcpServerConfig = {
+
+      # EmitDNS = false;
+      # PoolOffset = 50;
+      # EmitDNS = "yes";
+      # ServerAddress = "192.168.101.1/24";
+      DNS = [ "1.1.1.1" "1.0.0.1" ];
+      PoolSize = 100;
+      PoolOffset = 20;
+    };
+    # vlan = [ "cdwifi" "cdiot" "cdguest" ];
 
     # routes = [ { Gateway = "192.168.0.1"; } ];
 
@@ -112,27 +129,14 @@ IPMasquerade="ipv4";
     # };
 
     # dhcpServerStaticLeases.*.dhcpServerStaticLeaseConfig
-    dhcpServerStaticLeases = [
-      # {
-      #   dhcpServerStaticLeaseConfig = {
-      #     Address = "192.168.1.42";
-      #     MACAddress = "65:43:4a:5b:d8:5f";
-      #   };
-      # }
-    ];
-
-    # Each attribute in this set specifies an option in the [DHCPServer]
-    # section of the unit. See systemd.network(5) for details.
-    dhcpServerConfig = {
-      # EmitDNS = false;
-      # PoolOffset = 50;
-
-      PoolOffset = 100;
-      PoolSize = 20;
-      EmitDNS = "yes";
-      DNS = "9.9.9.9";
-
-    };
+    # dhcpServerStaticLeases = [
+    #   {
+    #     dhcpServerStaticLeaseConfig = {
+    #       Address = "192.168.101.2";
+    #       MACAddress = "18:65:71:e5:b1:e2";
+    #     };
+    #   }
+    # ];
 
     # Each attribute in this set specifies an option in the [DHCPPrefixDelegation]
     # section of the unit. See systemd.network(5) for details.
