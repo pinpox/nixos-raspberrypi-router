@@ -60,6 +60,9 @@ let cfg = config.pi-router.interfaces; in
               iifname $LAN_IFC tcp dport {53} accept
               iifname $LAN_IFC udp dport {53} accept
 
+              # allow dhcp on LAN
+              iifname $LAN_IFC udp dport {67} accept
+
               # count and drop any other traffic
               counter drop
           }

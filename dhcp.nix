@@ -2,7 +2,9 @@
 let
   cfg = config.pi-router;
 in
+
 {
+# networking.firewall.enable = false;
 
   systemd.network.enable = true;
   networking = {
@@ -13,20 +15,20 @@ in
     # nat.externalInterface = "enp1s0";
     # nat.internalInterfaces = [ "enp2s0" "enp3s0" "enp4s0" ];
 
-    firewall.interfaces =
-      let
-        portlist = [ 53 22 67 68 ];
-      in
-      {
-        "${cfg.interfaces.wan.name}" = {
-          allowedTCPPorts = portlist;
-          allowedUDPPorts = portlist;
-        };
-        "${cfg.interfaces.lan.name}" = {
-          allowedTCPPorts = portlist;
-          allowedUDPPorts = portlist;
-        };
-      };
+    # firewall.interfaces =
+    #   let
+    #     portlist = [ 53 22 67 68 ];
+    #   in
+    #   {
+    #     "${cfg.interfaces.wan.name}" = {
+    #       allowedTCPPorts = portlist;
+    #       allowedUDPPorts = portlist;
+    #     };
+    #     "${cfg.interfaces.lan.name}" = {
+    #       allowedTCPPorts = portlist;
+    #       allowedUDPPorts = portlist;
+    #     };
+    #   };
   };
 
   systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
