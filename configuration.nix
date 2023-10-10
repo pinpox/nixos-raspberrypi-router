@@ -15,37 +15,42 @@ in
     ./dhcp.nix
   ];
 
-  options.pi-router = {
+  options.pi-router = with lib;{
 
-    interfaces =
-      with lib;
-      {
-        lan = {
-          ip = mkOption {
-            type = types.str;
-            description = "IPv4 address of the LAN interface";
-            default = "192.168.101.1";
-          };
-          name = mkOption {
-            type = types.str;
-            description = "Interface used for LAN";
-            default = "end0";
-          };
+    dnsServers = mkOption {
+      type = types.listOf types.str;
+      description = "List of DNS servers";
+      default = [ "1.1.1.1" "1.0.0.1" ];
+      example = [ "9.9.9.9" "1.0.0.1" ];
+    };
+
+    interfaces = {
+      lan = {
+        ip = mkOption {
+          type = types.str;
+          description = "IPv4 address of the LAN interface";
+          default = "192.168.101.1";
         };
-
-        wan = {
-          # ip = mkOption {
-          #   type = types.str;
-          #   description = "IPv4 address of the WAN interface";
-          #   default = "192.168.101.1";
-          # };
-          name = mkOption {
-            type = types.str;
-            description = "Interface used for WAN";
-            default = "enp1s0";
-          };
+        name = mkOption {
+          type = types.str;
+          description = "Interface used for LAN";
+          default = "end0";
         };
       };
+
+      wan = {
+        # ip = mkOption {
+        #   type = types.str;
+        #   description = "IPv4 address of the WAN interface";
+        #   default = "192.168.101.1";
+        # };
+        name = mkOption {
+          type = types.str;
+          description = "Interface used for WAN";
+          default = "enp1s0";
+        };
+      };
+    };
   };
 
   config = {

@@ -23,83 +23,49 @@ let cfg = config.pi-router.interfaces; in
   # ct (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Ct)
   # ct state { new, established, related, untracked } -> State of the connection
 
-  networking.nat = {
-    enable = true;
-    externalInterface = cfg.lan.name;
-    internalInterfaces = [ cfg.wan.name ];
-  };
+  networking = {
 
+    firewall.enable = true;
+    nftables.enable = true;
 
-  networking.firewall.extraInputRules = ''
-
-              # ICMP:
-              # routers may also want: mld-listener-query, nd-router-solicit
-              ip6 nexthdr icmpv6 icmpv6 type {
-                destination-unreachable,
-                packet-too-big,
-                time-exceeded,
-                parameter-problem,
-                nd-router-advert,
-                nd-neighbor-solicit,
-                nd-neighbor-advert
-              } accept
-
-              ip protocol icmp icmp type {
-                destination-unreachable,
-                router-advertisement,
-                time-exceeded,
-                parameter-problem
-              } accept
-
-              # count and drop any other traffic
-              counter drop
-      '';
-
-  # networking.firewall.extraForwardRules = ''
-
-  #         type filter hook forward priority 0;
-
-  #         # allow LAN to WAN
-  #         iifname $LAN_IFC oifname $WAN_IFC accept
-
-  #         # drop new packages between interfaces
-  #         iifname $ALL_IFC oifname $ALL_IFC ct state new counter drop
-
-  #         accept
-  # '';
-
-  networking.nftables =
-    # let
-    #   defs = ''
-    #     define LAN_IFC = { "${cfg.lan.name}" }
-    #     define LAN_NET = { ${cfg.lan.ip}/24 }
-    #     define WAN_IFC = { "${cfg.wan.name}" }
-    #     define ALL_IFC = { "${cfg.lan.name}", "${cfg.wan.name}" }
-    #   '';
-    # in
-    {
+    nat = {
       enable = true;
-
-
-      # tables = {
-
-      #   filter = {
-      #     enable = true;
-      #     family = "inet";
-      #     content = ''
-
-      #     ${defs}
-
-      #     # Allow all outgoing connections.
-      #     chain output {
-      #         type filter hook output priority 0;
-      #         accept
-      #     }
-
-      #     chain forward {
-      #     }
-      #   '';
-      #   };
-      # };
+      externalInterface = cfg.lan.name;
+      internalInterfaces = [ cfg.wan.name ];
     };
+
+    firewall.extraInputRules = ''
+      # ICMP:
+      # routers may also want: mld-listener-query, nd-router-solicit
+      ip6 nexthdr icmpv6 icmpv6 type {
+        destination-unreachable,
+        packet-too-big,
+        time-exceeded,
+        parameter-problem,
+        nd-router-advert,
+        nd-neighbor-solicit,
+        nd-neighbor-advert
+      } accept
+
+      ip protocol icmp icmp type {
+        destination-unreachable,
+        router-advertisement,
+        time-exceeded,
+        parameter-problem
+      } accept
+
+      # count and drop any other traffic
+      counter drop
+    '';
+
+    #firewall.extraForwardRules = ''
+    #   type filter hook forward priority 0;
+    #   # allow LAN to WAN
+    #   iifname $LAN_IFC oifname $WAN_IFC accept
+    #   # drop new packages between interfaces
+    #   iifname $ALL_IFC oifname $ALL_IFC ct state new counter drop
+    #   accept
+    # '';
+
+  };
 }
