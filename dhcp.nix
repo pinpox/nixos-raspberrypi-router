@@ -40,7 +40,7 @@ in
       # PoolOffset = 50;
       # EmitDNS = "yes";
       # ServerAddress = "192.168.101.1/24";
-      DNS = cfg.dnsServers;
+      DNS = [ cfg.interfaces.lan.ip ];
       PoolSize = 100;
       PoolOffset = 20;
     };
