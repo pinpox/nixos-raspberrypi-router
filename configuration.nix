@@ -59,6 +59,10 @@ in
     users.users.root = {
       openssh.authorizedKeys.keyFiles = [
         (pkgs.fetchurl {
+          url = "https://github.com/MayNiklas.keys";
+          sha256 = "sha256-QW7XAqj9EmdQXYEu8EU74eFWml5V0ALvbQOnjk8ce/U=";
+        })
+        (pkgs.fetchurl {
           url = "https://github.com/pinpox.keys";
           sha256 = "sha256-V0ek+L0axLt8v1sdyPXHfZgkbOxqwE3Zw8vOT2aNDcE=";
         })
