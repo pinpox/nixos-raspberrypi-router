@@ -58,14 +58,16 @@ let cfg = config.pi-router.interfaces; in
       counter drop
     '';
 
-    #firewall.extraForwardRules = ''
-    #   type filter hook forward priority 0;
-    #   # allow LAN to WAN
-    #   iifname $LAN_IFC oifname $WAN_IFC accept
-    #   # drop new packages between interfaces
-    #   iifname $ALL_IFC oifname $ALL_IFC ct state new counter drop
-    #   accept
-    # '';
+    firewall.filterForward = true;
+
+    firewall.extraForwardRules = ''
+      # type filter hook forward priority 0;
+      # allow LAN to WAN
+      iifname "${cfg.lan.name}" oifname "${cfg.wan.name}" accept
+      # drop new packages between interfaces
+      iifname {"${cfg.lan.name}", "${cfg.wan.name}"} oifname {"${cfg.lan.name}", "${cfg.wan.name}"} ct state new counter drop
+      accept
+    '';
 
   };
 }
