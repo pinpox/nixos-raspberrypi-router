@@ -33,7 +33,7 @@ let cfg = config.pi-router.interfaces; in
 
         define WAN_IFC = { "${cfg.wan.name}" }
 
-        define ALL_IFC = { "${cfg.lan.name}" "${cfg.wan.name}" }
+        define ALL_IFC = { "${cfg.lan.name}", "${cfg.wan.name}" }
 
         table inet filter {
             # Block all incomming connections traffic except SSH and "ping" and DNS.
