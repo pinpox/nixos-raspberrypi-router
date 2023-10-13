@@ -8,7 +8,7 @@ in
   networking = {
     useDHCP = false;
     nameservers = cfg.dnsServers;
-    firewall.interfaces."${cfg.interfaces.lan.name}".allowedUDPPorts = [ 67 68 ];
+    firewall.interfaces."${cfg.interfaces.lan.name}".allowedUDPPorts = [ 67 ];
   };
 
   # Useful for debugging systemd-networkds and DHCP
