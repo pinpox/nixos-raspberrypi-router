@@ -30,8 +30,8 @@ let cfg = config.pi-router.interfaces; in
 
     nat = {
       enable = true;
-      externalInterface = cfg.lan.name;
-      internalInterfaces = [ cfg.wan.name ];
+      externalInterface = cfg.wan.name;
+      internalInterfaces = [ cfg.lan.name ];
     };
 
     firewall.extraInputRules = ''
