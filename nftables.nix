@@ -35,17 +35,19 @@ let cfg = config.pi-router.interfaces; in
     };
 
     firewall.extraInputRules = ''
+
+      # TODO: add for IPv6
       # ICMP:
       # routers may also want: mld-listener-query, nd-router-solicit
-      ip6 nexthdr icmpv6 icmpv6 type {
-        destination-unreachable,
-        packet-too-big,
-        time-exceeded,
-        parameter-problem,
-        nd-router-advert,
-        nd-neighbor-solicit,
-        nd-neighbor-advert
-      } accept
+      # ip6 nexthdr icmpv6 icmpv6 type {
+      #   destination-unreachable,
+      #   packet-too-big,
+      #   time-exceeded,
+      #   parameter-problem,
+      #   nd-router-advert,
+      #   nd-neighbor-solicit,
+      #   nd-neighbor-advert
+      # } accept
 
       ip protocol icmp icmp type {
         destination-unreachable,
