@@ -7,7 +7,8 @@ in
 
   networking = {
     useDHCP = false;
-    nameservers = cfg.dnsServers;
+    # Not used as we use our own unbound DNS. This is just a fallback.
+    nameservers = [ "8.8.8.8" ];
     firewall.interfaces."${cfg.interfaces.lan.name}".allowedUDPPorts = [ 67 ];
   };
 

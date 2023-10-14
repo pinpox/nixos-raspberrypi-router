@@ -17,13 +17,6 @@ in
 
   options.pi-router = with lib;{
 
-    dnsServers = mkOption {
-      type = types.listOf types.str;
-      description = "List of DNS servers";
-      default = [ "1.1.1.1" "1.0.0.1" ];
-      example = [ "9.9.9.9" "1.0.0.1" ];
-    };
-
     interfaces = {
       lan = {
         ip = mkOption {
