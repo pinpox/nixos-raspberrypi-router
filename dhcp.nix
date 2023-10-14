@@ -8,7 +8,7 @@ in
   networking = {
     useDHCP = false;
     nameservers = cfg.dnsServers;
-    firewall.interfaces."${cfg.interfaces.lan.name}".allowedUDPPorts = [ 67 68 ];
+    firewall.interfaces."${cfg.interfaces.lan.name}".allowedUDPPorts = [ 67 ];
   };
 
   # Useful for debugging systemd-networkds and DHCP
@@ -40,7 +40,7 @@ in
       # PoolOffset = 50;
       # EmitDNS = "yes";
       # ServerAddress = "192.168.101.1/24";
-      DNS = cfg.dnsServers;
+      DNS = [ cfg.interfaces.lan.ip ];
       PoolSize = 100;
       PoolOffset = 20;
     };
