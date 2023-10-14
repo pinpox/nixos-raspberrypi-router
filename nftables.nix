@@ -1,4 +1,12 @@
 { config, ... }:
+
+
+# To just show the generated ruleset for debugging use:
+# cat $(grep -om1 '/nix/store/.*-nftables-rules' "$(nix build \
+# '.#nixosConfigurations.nixos-router.config.system.build.toplevel' \
+# --print-out-paths)"/etc/systemd/system/nftables.service)
+
+
 let cfg = config.pi-router.interfaces; in
 {
 
