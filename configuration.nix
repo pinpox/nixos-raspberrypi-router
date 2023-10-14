@@ -10,6 +10,7 @@ in
     ./dns.nix
     ./hardware.nix
     ./nftables.nix
+    ./iperf3.nix
     # ./nat.nix
     # ./firewall.nix
     ./dhcp.nix
