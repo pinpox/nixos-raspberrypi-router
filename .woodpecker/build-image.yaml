@@ -20,12 +20,12 @@ pipeline:
     commands:
       - attic push nix-cache result
 
-  - name: build image
-    image: bash
-    commands:
-      - nix build --print-out-paths
+  # - name: build image
+  #   image: bash
+  #   commands:
+  #     - nix build --print-out-paths
 
-  - name: push image
-    image: bash
-    commands:
-      - attic push nix-cache result
+  # - name: push image
+  #   image: bash
+  #   commands:
+  #     - attic push nix-cache result

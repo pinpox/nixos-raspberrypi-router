@@ -1,4 +1,12 @@
-{ config, pkgs, lib, ... }:
+{ config, ... }:
+
+
+# To just show the generated ruleset for debugging use:
+# cat $(grep -om1 '/nix/store/.*-nftables-rules' "$(nix build \
+# '.#nixosConfigurations.nixos-router.config.system.build.toplevel' \
+# --print-out-paths)"/etc/systemd/system/nftables.service)
+
+
 let cfg = config.pi-router.interfaces; in
 {
 
@@ -23,87 +31,53 @@ let cfg = config.pi-router.interfaces; in
   # ct (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Ct)
   # ct state { new, established, related, untracked } -> State of the connection
 
-  networking.nftables = {
-    enable = true;
-    ruleset = ''
-      define LAN_IFC = { "${cfg.lan.name}" }
-      define LAN_NET = { ${cfg.lan.ip}/24 }
+  networking = {
 
-      define WAN_IFC = { "${cfg.wan.name}" }
+    firewall.enable = true;
+    nftables.enable = true;
 
-      define ALL_IFC = { "${cfg.lan.name}" "${cfg.wan.name}" }
+    nat = {
+      enable = true;
+      externalInterface = cfg.wan.name;
+      internalInterfaces = [ cfg.lan.name ];
+    };
 
-      table inet filter {
-          # Block all incomming connections traffic except SSH and "ping" and DNS.
-          chain input {
-              type filter hook input priority 0;
+    firewall.extraInputRules = ''
 
-              # accept any localhost traffic
-              iifname lo accept
+      # TODO: add for IPv6
+      # ICMP:
+      # routers may also want: mld-listener-query, nd-router-solicit
+      # ip6 nexthdr icmpv6 icmpv6 type {
+      #   destination-unreachable,
+      #   packet-too-big,
+      #   time-exceeded,
+      #   parameter-problem,
+      #   nd-router-advert,
+      #   nd-neighbor-solicit,
+      #   nd-neighbor-advert
+      # } accept
 
-              # accept traffic originated from us
-              ct state {established, related} accept
+      ip protocol icmp icmp type {
+        destination-unreachable,
+        router-advertisement,
+        time-exceeded,
+        parameter-problem
+      } accept
 
-              # ICMP
-              # routers may also want: mld-listener-query, nd-router-solicit
-              ip6 nexthdr icmpv6 icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept
-              ip protocol icmp icmp type { destination-unreachable, router-advertisement, time-exceeded, parameter-problem } accept
-
-              # allow "ping"
-              ip6 nexthdr icmpv6 icmpv6 type echo-request accept
-              ip protocol icmp icmp type echo-request accept
-
-              # allow SSH
-              tcp dport 22 accept
-
-              # allow DNS via LAN
-              iifname $LAN_IFC tcp dport {53} accept
-              iifname $LAN_IFC udp dport {53} accept
-
-              # count and drop any other traffic
-              counter drop
-          }
-
-          # Allow all outgoing connections.
-          chain output {
-              type filter hook output priority 0;
-              accept
-          }
-
-          chain forward {
-              type filter hook forward priority 0;
-              
-              # allow LAN to WAN
-              iifname $LAN_IFC oifname $WAN_IFC accept
-
-              # drop new packages between interfaces
-              iifname $ALL_IFC oifname $ALL_IFC ct state new counter drop
-
-              accept
-          }
-      }
-
-      table ip nat {
-          chain PREROUTING {
-              type nat hook prerouting priority dstnat; policy accept;
-          }
-
-          chain INPUT {
-              type nat hook input priority 100; policy accept;
-          }
-
-          chain OUTPUT {
-              type nat hook output priority -100; policy accept;
-          }
-
-          chain POSTROUTING {
-              type nat hook postrouting priority srcnat; policy accept;
-
-              # NAT between LAN and WAN
-              oifname $WAN_IFC ip saddr $LAN_NET counter masquerade
-          }
-      }
+      # count and drop any other traffic
+      counter drop
     '';
-  };
 
+    firewall.filterForward = true;
+
+    firewall.extraForwardRules = ''
+      # type filter hook forward priority 0;
+      # allow LAN to WAN
+      iifname "${cfg.lan.name}" oifname "${cfg.wan.name}" accept
+      # drop new packages between interfaces
+      iifname {"${cfg.lan.name}", "${cfg.wan.name}"} oifname {"${cfg.lan.name}", "${cfg.wan.name}"} ct state new counter drop
+      accept
+    '';
+
+  };
 }
