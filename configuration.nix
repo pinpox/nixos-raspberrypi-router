@@ -71,7 +71,6 @@ in
       darkstat # network statistics web interface
       dnsutils # dig, nslookup, etc.
       ethtool # manage NIC settings (offload, NIC feeatures, ...)
-      htop # to see the system load
       iftop # display bandwidth usage on a network interface
       iperf3 # speedtest between 2 devices
       ppp # for some manual debugging of pppd
@@ -79,6 +78,19 @@ in
       tcpdump # view network traffic
       traceroute # tracks the route taken by packets over an IP network
     ];
+
+    # changing some settings for htop makes it more useful for our use case as a router
+    programs.htop = {
+      enable = true;
+      settings = {
+        # important since we want to see our networking stack
+        hide_kernel_threads = false;
+        hide_userland_threads = false;
+        # helpful for keeping an eye on temperatures
+        show_cpu_frequency = true;
+        show_cpu_temperature = true;
+      };
+    };
 
     # Time zone and internationalisation
     time.timeZone = "Europe/Berlin";
