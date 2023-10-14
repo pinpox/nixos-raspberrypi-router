@@ -66,8 +66,18 @@ in
     };
 
     environment.systemPackages = with pkgs; [
+      bmon # network bandwidth monitor
+      conntrack-tools # view network connection states
+      darkstat # network statistics web interface
       dnsutils # dig, nslookup, etc.
+      ethtool # manage NIC settings (offload, NIC feeatures, ...)
+      htop # to see the system load
+      iftop # display bandwidth usage on a network interface
       iperf3 # speedtest between 2 devices
+      ppp # for some manual debugging of pppd
+      speedtest-cli # speedtest.net from the command line
+      tcpdump # view network traffic
+      traceroute # tracks the route taken by packets over an IP network
     ];
 
     # Time zone and internationalisation
