@@ -14,6 +14,7 @@ in
     # ./nat.nix
     # ./firewall.nix
     ./dhcp.nix
+    ./pppoe.nix
   ];
 
   options.pi-router = with lib;{

@@ -12,6 +12,7 @@ in
   services.unbound = {
     enable = true;
     settings = {
+      remote-control.control-enable = true;
       server = {
         interface = [ "127.0.0.1" cfg.interfaces.lan.ip ];
         access-control = [
