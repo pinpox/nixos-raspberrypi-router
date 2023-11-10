@@ -5,47 +5,16 @@ in
 {
 
   imports = [
-    ./nixos.nix
-    ./ssh.nix
+    ./dhcp.nix
     ./dns.nix
     ./hardware.nix
-    ./nftables.nix
     ./iperf3.nix
-    # ./nat.nix
-    # ./firewall.nix
+    ./nftables.nix
+    ./nixos.nix
+    ./options.nix
+    ./ssh.nix
     ./dhcp.nix
   ];
-
-  options.pi-router = with lib;{
-
-    interfaces = {
-      lan = {
-        ip = mkOption {
-          type = types.str;
-          description = "IPv4 address of the LAN interface";
-          default = "192.168.101.1";
-        };
-        name = mkOption {
-          type = types.str;
-          description = "Interface used for LAN";
-          default = "end0";
-        };
-      };
-
-      wan = {
-        # ip = mkOption {
-        #   type = types.str;
-        #   description = "IPv4 address of the WAN interface";
-        #   default = "192.168.101.1";
-        # };
-        name = mkOption {
-          type = types.str;
-          description = "Interface used for WAN";
-          default = "enp1s0";
-        };
-      };
-    };
-  };
 
   config = {
 

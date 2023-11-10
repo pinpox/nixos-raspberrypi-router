@@ -34,7 +34,7 @@
         modules = [
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           ./configuration.nix
-            nixos-hardware.nixosModules.raspberry-pi-4
+          nixos-hardware.nixosModules.raspberry-pi-4
           {
             nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
             nix.registry.nixpkgs.flake = nixpkgs;
@@ -52,5 +52,9 @@
             self.nixosConfigurations.nixos-router.config.system.build.sdImage;
           default = raspi-image;
         });
+
+      # nix run .\#checks.x86_64-linux.vmTest.driver
+      checks = import ./checks.nix { nixpkgs = nixpkgs; };
+
     };
 }
