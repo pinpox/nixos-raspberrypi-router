@@ -27,6 +27,13 @@
     in
     {
 
+      nixosModules = builtins.listToAttrs (map
+        (x: {
+          name = x;
+          value = import (./modules + "/${x}");
+        })
+        (builtins.attrNames (builtins.readDir ./modules)));
+
       # nixosModules.mymodule = { config, pkgs, lib, ... }: { };
 
       nixosConfigurations.nixos-router = nixpkgs.lib.nixosSystem {
@@ -35,7 +42,9 @@
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           ./configuration.nix
           nixos-hardware.nixosModules.raspberry-pi-4
+          { imports = builtins.attrValues self.nixosModules; }
           {
+
             nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
             nix.registry.nixpkgs.flake = nixpkgs;
             sdImage.compressImage = false;
@@ -54,7 +63,7 @@
         });
 
       # nix run .\#checks.x86_64-linux.vmTest.driver
-      checks = import ./checks.nix { nixpkgs = nixpkgs; };
+      checks = import ./checks.nix { nixpkgs = nixpkgs; modules = self.nixosModules; };
 
     };
 }

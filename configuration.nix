@@ -1,20 +1,8 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, config, ... }:
 let
   cfg = config.pi-router;
 in
 {
-
-  imports = [
-    ./dhcp.nix
-    ./dns.nix
-    ./hardware.nix
-    ./iperf3.nix
-    ./nftables.nix
-    ./nixos.nix
-    ./options.nix
-    ./ssh.nix
-    ./dhcp.nix
-  ];
 
   config = {
 
@@ -90,5 +78,51 @@ in
         }];
       };
     };
+
+    # Nix settings
+    nix = {
+      package = pkgs.nixFlakes;
+      extraOptions = ''
+        experimental-features = nix-command flakes
+        # Free up to 1GiB whenever there is less than 100MiB left.
+        min-free = ${toString (100 * 1024 * 1024)}
+        max-free = ${toString (1024 * 1024 * 1024)}
+      '';
+
+      settings = {
+        # Save space by hardlinking store files
+        auto-optimise-store = true;
+        allowed-users = [ "root" ];
+      };
+
+      # Clean up old generations after 30 days
+      gc = {
+        automatic = true;
+        dates = "weekly";
+        options = "--delete-older-than 30d";
+      };
+    };
+
+    system.stateVersion = "23.05";
+
+    # Hardware-specific settings
+
+    # Workaround for failing module. See PR
+    nixpkgs.overlays = [
+      (final: super: {
+        makeModulesClosure = x:
+          super.makeModulesClosure (x // { allowMissing = true; });
+      })
+    ];
+
+    # Enable serial console on GPIO pins
+    boot.kernelParams = [ "console=ttyS1,115200n8" ];
+
+    # Required for the Wireless firmware
+    # hardware.enableRedistributableFirmware = true;
+
+    # CPU profile
+    # powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
+
   };
 }

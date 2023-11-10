@@ -1,5 +1,4 @@
-{ nixpkgs, ... }: {
-
+{ nixpkgs, modules, ... }: {
 
   x86_64-linux = let system = "x86_64-linux"; in {
     vmTest =
@@ -15,9 +14,9 @@
           # simulating the public internet
           public = { pkgs, config, ... }: {
             imports = [
-              ./dhcp.nix
-              ./iperf3.nix
-              ./options.nix
+              modules.dhcp
+              modules.iperf3
+              modules.options
             ];
             pi-router.interfaces.lan = {
               name = "eth1";
@@ -43,11 +42,11 @@
           # the router we are testing
           router = { pkgs, config, ... }: {
             imports = [
-              ./dhcp.nix
-              ./dns.nix
-              ./iperf3.nix
-              ./nftables.nix
-              ./options.nix
+              modules.dhcp
+              modules.dns
+              modules.iperf3
+              modules.nftables
+              modules.options
             ];
             pi-router = {
               interfaces = {
