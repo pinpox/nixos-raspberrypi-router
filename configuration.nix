@@ -56,11 +56,6 @@ in
       keyMap = "de";
     };
 
-    # allow routing between interfaces
-    boot.kernel.sysctl = {
-      "net.ipv4.conf.all.forwarding" = true;
-    };
-
     # Networking
     networking = {
       hostName = "nixos-router";

@@ -80,4 +80,10 @@ let cfg = config.pi-router.interfaces; in
     '';
 
   };
+
+  # allow routing between interfaces
+  boot.kernel.sysctl = {
+    "net.ipv4.conf.all.forwarding" = true;
+  };
+
 }
