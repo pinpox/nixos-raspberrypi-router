@@ -1,48 +1,48 @@
-{ config, ... }:
-
-
-# To just show the generated ruleset for debugging use:
-# cat $(grep -om1 '/nix/store/.*-nftables-rules' "$(nix build \
-# '.#nixosConfigurations.nixos-router.config.system.build.toplevel' \
-# --print-out-paths)"/etc/systemd/system/nftables.service)
-
-
-let cfg = config.pi-router.interfaces; in
+{ config, lib, ... }:
+with lib;
+let
+  cfg = config.pi-router.interfaces;
+in
 {
+  options.pi-router.nftables = {
+    traffic-shaping = mkEnableOption "enable traffic shaping";
+  };
 
-  # Check out https://wiki.nftables.org/ for better documentation.
-  # Table for both IPv4 and IPv6.
+  config = {
 
-  # Matching by interface (https://wiki.nftables.org/wiki-nftables/index.php/Matching_packet_metainformation)
-  # iifname -> input interface name
-  # oifname -> output interface name
+    # Check out https://wiki.nftables.org/ for better documentation.
+    # Table for both IPv4 and IPv6.
 
-  # ip (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Ip)
-  # ip saddr -> Source address
-  # ip daddr -> Destination address
-  # ip protocol { icmp, esp, ah, comp, udp, udplite, tcp, dccp, sctp } -> Upper layer protocol
+    # Matching by interface (https://wiki.nftables.org/wiki-nftables/index.php/Matching_packet_metainformation)
+    # iifname -> input interface name
+    # oifname -> output interface name
 
-  # tcp (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Tcp)
-  # tcp dport -> Destination port
+    # ip (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Ip)
+    # ip saddr -> Source address
+    # ip daddr -> Destination address
+    # ip protocol { icmp, esp, ah, comp, udp, udplite, tcp, dccp, sctp } -> Upper layer protocol
 
-  # udp (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Udp)
-  # udp dport -> Destination port
+    # tcp (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Tcp)
+    # tcp dport -> Destination port
 
-  # ct (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Ct)
-  # ct state { new, established, related, untracked } -> State of the connection
+    # udp (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Udp)
+    # udp dport -> Destination port
 
-  networking = {
+    # ct (https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Ct)
+    # ct state { new, established, related, untracked } -> State of the connection
 
-    firewall.enable = true;
-    nftables.enable = true;
+    networking = {
 
-    nat = {
-      enable = true;
-      externalInterface = cfg.wan.name;
-      internalInterfaces = [ cfg.lan.name ];
-    };
+      firewall.enable = true;
+      nftables.enable = true;
 
-    firewall.extraInputRules = ''
+      nat = {
+        enable = true;
+        externalInterface = cfg.wan.name;
+        internalInterfaces = [ cfg.lan.name ];
+      };
+
+      firewall.extraInputRules = ''
 
       # TODO: add for IPv6
       # ICMP:
@@ -68,22 +68,47 @@ let cfg = config.pi-router.interfaces; in
       counter drop
     '';
 
-    firewall.filterForward = true;
+      firewall.filterForward = true;
 
-    firewall.extraForwardRules = ''
-      # type filter hook forward priority 0;
-      # allow LAN to WAN
-      iifname "${cfg.lan.name}" oifname "${cfg.wan.name}" accept
-      # drop new packages between interfaces
-      iifname {"${cfg.lan.name}", "${cfg.wan.name}"} oifname {"${cfg.lan.name}", "${cfg.wan.name}"} ct state new counter drop
-      accept
-    '';
+      firewall.extraForwardRules = ''
+        # type filter hook forward priority 0;
+        # allow LAN to WAN
+        iifname "${cfg.lan.name}" oifname "${cfg.wan.name}" accept
+        # drop new packages between interfaces
+        iifname {"${cfg.lan.name}", "${cfg.wan.name}"} oifname {"${cfg.lan.name}", "${cfg.wan.name}"} ct state new counter drop
+        accept
+      '';
 
-  };
+      # https://search.nixos.org/options?channel=unstable&show=networking.nftables.tables
+      # This is currently opt in, because we need to benchmark this!
+      # Does it improve something?
+      nftables.tables.shaping = mkIf config.pi-router.nftables.traffic-shaping {
+        enable = true;
+        family = "inet";
+        name = "shaping";
+        content = ''
+          chain postrouting {
+              type route hook output priority -150; policy accept;
+              ip daddr != 192.168.0.0/16 jump wan                               # non LAN traffic: chain wan
+              ip daddr 192.168.0.0/16 meta length 1-64 meta priority set 1:11   # small packets in LAN: priority
+            }
+            chain wan {
+              tcp dport 22 meta priority set 1:21 return                       # SSH traffic -> Internet: priority
+              tcp dport { 27015, 27036 } meta priority set 1:21 return         # CS traffic -> Internet: priority
+              udp dport { 27015, 27031-27036 } meta priority set 1:21 return   # CS traffic -> Internet: priority
+              meta length 1-64 meta priority set 1:21 return                   # small packets -> Internet: priority
+              meta priority set 1:20 counter                                   # default -> Internet: normal
+            }
+        '';
+      };
 
-  # allow routing between interfaces
-  boot.kernel.sysctl = {
-    "net.ipv4.conf.all.forwarding" = true;
+    };
+
+    # allow routing between interfaces
+    boot.kernel.sysctl = {
+      "net.ipv4.conf.all.forwarding" = true;
+    };
+
   };
 
 }

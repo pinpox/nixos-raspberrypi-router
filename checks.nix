@@ -59,6 +59,7 @@
                   mac = "02:de:ad:be:ef:01";
                 }
               ];
+              nftables.traffic-shaping = true;
               unbound.A-records = { "pi-router.de" = "${config.pi-router.interfaces.lan.ip}"; };
             };
             environment.systemPackages = with pkgs; [ dnsutils ];
